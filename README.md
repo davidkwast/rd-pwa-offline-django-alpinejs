@@ -1,0 +1,1 @@
+# rd-pwa-offline-django-alpinejs
