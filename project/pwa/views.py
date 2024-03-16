@@ -8,20 +8,7 @@ from . import forms
 def workouts(request):
 
     Form = forms.Workout
-
-    if request.method == 'POST':
-
-        form = Form(request.POST)
-
-        if form.is_valid():
-            print(form.cleaned_data)
-            return HttpResponse('OK', status=200, content_type='text/plain')
-
-        else:
-            return HttpResponse('ERROR', status=400, content_type='text/plain')
-
-    else:
-        form = Form(initial={'data': {}})
+    form = Form(initial={'data': {}})
 
     #
     workouts = [
@@ -40,3 +27,22 @@ def workouts(request):
     }
     #
     return render(request, 'workouts.html', ctx)
+
+
+def update(request):
+
+    Form = forms.Workout
+
+    if request.method == 'POST':
+
+        form = Form(request.POST)
+
+        if form.is_valid():
+            print(form.cleaned_data)
+            return HttpResponse('OK', status=201, content_type='text/plain')
+
+        else:
+            return HttpResponse('ERROR', status=400, content_type='text/plain')
+
+    else:
+        return HttpResponse('Not found', status=404, content_type='text/plain')

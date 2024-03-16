@@ -27,8 +27,9 @@
 
 <script>
 
+
 const form = document.getElementById('form');
-    
+
 const form_input = document.getElementById('id_data');
 
 
@@ -36,7 +37,7 @@ let server_update_data = {}
 
 
 
-async function try_to_send_data() {
+async function try_to_send_data(send_go_to_home) {
     form_input.value = JSON.stringify(server_update_data)
 
     const data = new FormData(form);
@@ -44,19 +45,38 @@ async function try_to_send_data() {
 
     try {
         const res = await fetch(
-          './',
+          '../update/',
           {
             method: 'POST',
             body: data,
           },
         );
-    
+        
         const resData = await res.text();
-    
         console.debug(resData);
+        
+        // on success
+        if (resData.status === 201){
+            
+            //fg_error = false
+            //fg_online = true
+
+            if (send_go_to_home === true) {
+                Alpine.store('workout').id = 0
+                form_input.value = '{}'
+            }
+        }
+        else {
+            //fg_error = true
+            //fg_online = true
+        }
 
       } catch (err) {
         console.debug(err.message);
+
+        //fg_error = true
+        //fg_online = false
+
       }
 }
 
@@ -117,7 +137,7 @@ document.addEventListener('alpine:init', () => {
                 ts_end: this.ts_end,
                 laps: this.laps,
             }
-            try_to_send_data()
+            try_to_send_data(false)
             //console.debug(server_update_data)
         },
 
@@ -241,9 +261,14 @@ document.addEventListener('alpine:init', () => {
 
 
         <button
+            x-on:click="try_to_send_data(true)"
+            {% comment %} :disabled="!($store.workout.ts_end > 0)" {% endcomment %}
+        >SEND and go to home screen</button>
+
+        <button
             x-on:click="$store.workout.cancel()"
             :disabled="!($store.workout.ts_end > 0)"
-        >CANCEL</button>
+        >CANCEL and discard data</button>
 
 
     <div>
