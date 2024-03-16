@@ -51,12 +51,13 @@ async function try_to_send_data(send_go_to_home) {
             body: data,
           },
         );
+        console.debug(res);
         
         const resData = await res.text();
         console.debug(resData);
         
         // on success
-        if (resData.status === 201){
+        if (res.status === 201){
             
             //fg_error = false
             //fg_online = true
@@ -262,12 +263,12 @@ document.addEventListener('alpine:init', () => {
 
         <button
             x-on:click="try_to_send_data(true)"
-            {% comment %} :disabled="!($store.workout.ts_end > 0)" {% endcomment %}
+            :disabled="!($store.workout.ts_end > 0)"
         >SEND and go to home screen</button>
 
         <button
             x-on:click="$store.workout.cancel()"
-            :disabled="!($store.workout.ts_end > 0)"
+            {% comment %} :disabled="!($store.workout.ts_end > 0)" {% endcomment %}
         >CANCEL and discard data</button>
 
 
