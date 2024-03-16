@@ -51,10 +51,10 @@ async function try_to_send_data(send_go_to_home) {
             body: data,
           },
         );
-        console.debug(res);
+        //console.debug(res);
         
         const resData = await res.text();
-        console.debug(resData);
+        //console.debug(resData);
         
         // on success
         if (res.status === 201){
