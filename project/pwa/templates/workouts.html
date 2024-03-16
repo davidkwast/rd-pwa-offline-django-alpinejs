@@ -168,6 +168,10 @@ document.addEventListener('alpine:init', () => {
     })
 
 
+    if (Alpine.store('workout').id > 0) {
+        Alpine.store('workout').try_to_update_server()
+    }
+
     show_time()
     const intervalID = setInterval(show_time , 999);
 
