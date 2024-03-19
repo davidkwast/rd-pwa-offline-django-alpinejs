@@ -1,5 +1,8 @@
 from pathlib import Path
 
+from decouple import config
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -16,6 +19,10 @@ SECRET_KEY = (
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = [
+    config('TRUSTED_ORIGINS', default='http://localhost:8000')
+]
 
 
 # Application definition
