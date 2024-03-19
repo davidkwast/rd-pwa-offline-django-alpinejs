@@ -1,7 +1,7 @@
 {
     "name": "PWA - Demo",
     "short_name": "PWA-Demo",
-    "start_url": "/workouts/pwa/html/",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#fff",
     "description": "A simple PWA demo.",
