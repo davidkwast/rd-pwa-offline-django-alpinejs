@@ -6,17 +6,16 @@
 const OFFLINE_VERSION = 202403191900;
 const CACHE_NAME = "offline";
 // Customize this with a different URL if needed.
-const OFFLINE_URL = "/";
+const OFFLINE_URL = "/pwa.html";
 
 
 // (A) CREATE/INSTALL CACHE
 self.addEventListener("install", evt => {
-    self.skipWaiting();
     evt.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll([
-                "/",
-                "/workouts/pwa/html/",
+                "/pwa.html",
+                "/workouts/pwa/html/pwa.html",
                 "/static/pwa/manifest.json",
                 "/static/pwa/sw.js",
                 "/static/pwa/alpine_core.js",
@@ -25,6 +24,7 @@ self.addEventListener("install", evt => {
             ]))
             .catch(err => console.error(err))
     );
+    self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {

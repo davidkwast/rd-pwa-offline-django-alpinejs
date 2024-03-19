@@ -6,11 +6,13 @@ from project.pwa import views
 
 urlpatterns = [
     #
+    path('workouts/pwa/html/pwa.html', views.workouts),
     path('workouts/pwa/html/', views.workouts),
     path('workouts/pwa/update/', views.update),
     path('workouts/pwa/ping/', views.ping),
     #
     path('__admin__/', admin.site.urls),
     #
+    path('pwa.html', views.home),
     path('', views.home),
 ]
