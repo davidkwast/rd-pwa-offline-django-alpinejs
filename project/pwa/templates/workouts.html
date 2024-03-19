@@ -1,6 +1,35 @@
 <!doctype html>
 <html lang="">
-<head></head>
+<head>
+
+    <!-- https://code-boxx.com/simple-pwa-example/ -->
+
+    <!-- (B) ICONS & PLATFORM SPECIFIC -->
+    <!-- (B1) GOOD OLD FAVICON -->
+    <link rel="icon" href="/static/pwa/icon192.png" type="image/png">
+ 
+    <!-- (B2) ANDROID/CHROME -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="white">
+
+ 
+    <!-- (B4) WINDOWS -->
+    <meta name="msapplication-TileImage" content="/static/pwa/icon192.png">
+    <meta name="msapplication-TileColor" content="#ffffff">
+ 
+    <!-- (C) WEB APP MANIFEST -->
+    <!-- https://web.dev/add-manifest/ -->
+    <link rel="manifest" href="/static/pwa/manifest.json" />
+ 
+    <!-- (D) SERVICE WORKER -->
+    <script>
+    if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/static/pwa/sw.js"); }
+    </script>
+ 
+    <!-- (E) STYLESHEET + JAVASCRIPT -->
+    
+
+</head>
 
 
 <body>
@@ -8,10 +37,14 @@
 {% comment %} DO NOT CHANGE SCRIPT TAGs ORDER {% endcomment %}
 
 <!-- Alpine Plugins -->
-<script src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script> {% endcomment %}
+<script src="/static/pwa/alpine_persist.js"></script>
 
 {% comment %} DO NOT CHANGE SCRIPT TAGs ORDER {% endcomment %}
 
+
+<hr>
+<h2>debug</h2>
 
 <form id="form" methos="post">
 
@@ -37,11 +70,33 @@ let server_update_data = {}
 
 
 
+async function ping() {
+    try {
+        const res = await fetch('../ping/')
+
+        if (res.status === 200){
+            Alpine.store('app').online = true
+            Alpine.store('app').error = false
+        }
+        else {
+            Alpine.store('app').online = false
+            Alpine.store('app').error = true
+        }
+    }
+    catch (err) {
+        console.debug('ping:',err.message)
+
+        Alpine.store('app').online = false
+    }
+}
+
+
 async function try_to_send_data(send_go_to_home) {
     form_input.value = JSON.stringify(server_update_data)
 
     const data = new FormData(form);
     //console.debug(Array.from(data));  
+
 
     try {
         const res = await fetch(
@@ -59,24 +114,26 @@ async function try_to_send_data(send_go_to_home) {
         // on success
         if (res.status === 201){
             
-            //fg_error = false
-            //fg_online = true
+            Alpine.store('app').online = true
+            Alpine.store('app').error = false
 
             if (send_go_to_home === true) {
                 Alpine.store('workout').id = 0
                 form_input.value = '{}'
+
+                // reload only when "got_to_home" and online
+                location.reload()
             }
         }
         else {
-            //fg_error = true
-            //fg_online = true
+            Alpine.store('app').online = false
+            Alpine.store('app').error = true
         }
 
       } catch (err) {
-        console.debug(err.message);
+        console.debug('try_to_send_data:',err.message);
 
-        //fg_error = true
-        //fg_online = false
+        Alpine.store('app').online = false
 
       }
 }
@@ -102,8 +159,14 @@ document.addEventListener('alpine:init', () => {
     //console.log('alpine:init')
 
 
+    Alpine.store('app', {
+        fg_online: false,
+        fg_error: false,
+    }),
+
+
     Alpine.store('server', {
-        workouts: Alpine.$persist(jsdata['workouts']).as('server_workouts'),
+        workouts: Alpine.$persist([]).as('server_workouts'),
     }),
 
 
@@ -196,6 +259,12 @@ document.addEventListener('alpine:init', () => {
     show_time()
     const intervalID = setInterval(show_time , 999);
 
+    ping()
+    const ping_intervalID = setInterval(ping , 14999);
+
+    // TODO: check if always valid when PWA is offline
+    Alpine.store('server').workouts = jsdata['workouts']
+
 })
 
 
@@ -205,7 +274,8 @@ document.addEventListener('alpine:init', () => {
 {% comment %} DO NOT CHANGE SCRIPT TAGs ORDER {% endcomment %}
 
 <!-- Alpine Core -->
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> {% endcomment %}
+<script src="/static/pwa/alpine_core.js"></script>
 
 {% comment %} DO NOT CHANGE SCRIPT TAGs ORDER {% endcomment %}
 
@@ -213,10 +283,20 @@ document.addEventListener('alpine:init', () => {
 {% comment %} HTML MUST GO BELLOW {% endcomment %}
 
 
+<hr>
+<h2>app</h2>
+
+
 <div>
 
 
     <div id="home" x-show="!($store.workout.id)">
+
+
+        <button
+            x-on:click="location.reload()"
+            :disabled="!($store.app.online === true)"
+        >REFRESH DATA</button>
 
         <ul>
             <template x-for="workout in $store.server.workouts">
@@ -263,7 +343,7 @@ document.addEventListener('alpine:init', () => {
 
         <button
             x-on:click="try_to_send_data(true)"
-            :disabled="!($store.workout.ts_end > 0)"
+            :disabled="!($store.workout.ts_end > 0) || !($store.app.online === true)"
         >SEND and go to home screen</button>
 
         <button
@@ -272,12 +352,20 @@ document.addEventListener('alpine:init', () => {
         >CANCEL and discard data</button>
 
 
-    <div>
+    </div>
     
 
 </div>
 
 
+
+<hr>
+<h2>pwa status</h2>
+
+<ul>
+    <li>online: <span x-text="$store.app.online"></span></li>
+    <li>error: <span x-text="$store.app.error"></span></li>
+</ul>
 
 
 </body>
