@@ -12,5 +12,5 @@ urlpatterns = [
     #
     path('__admin__/', admin.site.urls),
     #
-    path('/', views.home),
+    path('', views.home),
 ]
