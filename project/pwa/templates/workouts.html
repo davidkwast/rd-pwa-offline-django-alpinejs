@@ -23,7 +23,14 @@
  
     <!-- (D) SERVICE WORKER -->
     <script>
-    if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/static/pwa/sw.js"); }
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register(
+            "/static/pwa/sw.js",
+            {
+                registrationStrategy: "registerImmediately",
+            }
+        );
+    }
     </script>
  
     <!-- (E) STYLESHEET + JAVASCRIPT -->
