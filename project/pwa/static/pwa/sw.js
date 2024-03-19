@@ -15,7 +15,6 @@ self.addEventListener("install", evt => {
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll([
                 "",
-                "/static/pwa/pwa.html",
                 "/workouts/pwa/html/",
                 "/workouts/pwa/html/pwa.html",
                 "/static/pwa/manifest.json",
