@@ -3,10 +3,10 @@
 // This variable is intentionally declared and unused.
 // Add a comment for your linter if you want:
 // eslint-disable-next-line no-unused-vars
-const OFFLINE_VERSION = 20240319;
+const OFFLINE_VERSION = 202403191900;
 const CACHE_NAME = "offline";
 // Customize this with a different URL if needed.
-const OFFLINE_URL = "/workouts/pwa/html/";
+const OFFLINE_URL = "/";
 
 
 // (A) CREATE/INSTALL CACHE
