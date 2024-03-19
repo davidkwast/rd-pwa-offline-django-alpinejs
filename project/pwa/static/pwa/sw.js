@@ -6,7 +6,7 @@
 const OFFLINE_VERSION = 202403191900;
 const CACHE_NAME = "offline";
 // Customize this with a different URL if needed.
-const OFFLINE_URL = "";
+const OFFLINE_URL = "./";
 
 
 // (A) CREATE/INSTALL CACHE
@@ -14,7 +14,7 @@ self.addEventListener("install", evt => {
     evt.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll([
-                "",
+                "./",
                 "/workouts/pwa/html/",
                 "/workouts/pwa/html/pwa.html",
                 "/static/pwa/manifest.json",
