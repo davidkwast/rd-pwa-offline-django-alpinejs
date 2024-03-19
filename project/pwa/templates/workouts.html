@@ -23,14 +23,14 @@
  
     <!-- (D) SERVICE WORKER -->
     <script>
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register(
-            "/static/pwa/sw.js",
-            {
-                registrationStrategy: "registerImmediately",
-            }
-        );
-    }
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+              navigator.serviceWorker
+                .register("/static/pwa/sw.js")
+                .then(res => console.log("service worker registered"))
+                .catch(err => console.log("service worker not registered", err))
+            })
+          }
     </script>
  
     <!-- (E) STYLESHEET + JAVASCRIPT -->
