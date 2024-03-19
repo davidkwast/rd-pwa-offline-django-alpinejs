@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  {% comment %}
+  <meta http-equiv="refresh" content="1; url='/workouts/pwa/html/'" /> {% endcomment %}
+
+  <!-- https://code-boxx.com/simple-pwa-example/ -->
+
+  <!-- (B) ICONS & PLATFORM SPECIFIC -->
+  <!-- (B1) GOOD OLD FAVICON -->
+  <link rel="icon" href="/static/pwa/icon192.png" type="image/png">
+
+  <!-- (B2) ANDROID/CHROME -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="white">
+
+
+  <!-- (B4) WINDOWS -->
+  <meta name="msapplication-TileImage" content="/static/pwa/icon192.png">
+  <meta name="msapplication-TileColor" content="#ffffff">
+
+  <!-- (C) WEB APP MANIFEST -->
+  <!-- https://web.dev/add-manifest/ -->
+  <link rel="manifest" href="/static/pwa/manifest.json" />
+
+  <!-- (D) SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("/static/pwa/sw.js")
+          .then(res => console.log("service worker registered"))
+          .catch(err => console.log("service worker not registered", err))
+      })
+    }
+  </script>
+
+</head>
+
+<body>
+  <p><a href="/workouts/pwa/html/">ABRIR</a></p>
+</body>
+
+</html>

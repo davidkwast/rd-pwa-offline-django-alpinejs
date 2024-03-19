@@ -13,6 +13,4 @@ urlpatterns = [
     #
     path('__admin__/', admin.site.urls),
     #
-    path('pwa.html', views.home),
-    path('', views.home),
 ]
