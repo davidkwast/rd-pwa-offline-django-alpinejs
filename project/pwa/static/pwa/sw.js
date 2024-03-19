@@ -4,9 +4,10 @@ self.addEventListener("install", evt => {
     evt.waitUntil(
         caches.open("PWA-Demo")
             .then(cache => cache.addAll([
-                "/",
+                //"/",
                 "/workouts/pwa/html/",
                 "/static/pwa/manifest.json",
+                "/static/pwa/sw.js",
                 "/static/pwa/alpine_core.js",
                 "/static/pwa/alpine_persist.js",
                 "/static/pwa/icon192.png"

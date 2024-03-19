@@ -6,6 +6,10 @@ from . import models
 from . import forms
 
 
+def home(request):
+    return render(request, 'home.html')
+
+
 def workouts(request):
 
     Form = forms.Workout
