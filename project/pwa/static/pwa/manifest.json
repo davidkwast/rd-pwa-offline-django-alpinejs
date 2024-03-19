@@ -2,7 +2,7 @@
     "name": "PWA - Demo",
     "short_name": "PWA-Demo",
     "start_url": "/",
-    "display": "standalone",
+    "display": "browser",
     "background_color": "#fff",
     "description": "A simple PWA demo.",
     "icons": [
