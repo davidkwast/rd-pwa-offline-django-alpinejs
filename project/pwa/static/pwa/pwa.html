@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="">
 
 <head>
 
@@ -34,10 +34,324 @@
     }
   </script>
 
+  <!-- (E) STYLESHEET + JAVASCRIPT -->
+
+
 </head>
 
+
 <body>
-  <p><a href="/workouts/pwa/html/">ABRIR</a></p>
+
+  <!-- DO NOT CHANGE SCRIPT TAGs ORDER -->
+
+  <!-- Alpine Plugins -->
+  <!--
+  <script src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script> -->
+  <script src="/static/pwa/alpine_persist.js"></script>
+
+  <!-- DO NOT CHANGE SCRIPT TAGs ORDER -->
+
+
+  <hr>
+  <h2>debug</h2>
+
+  <form id="form" method="post">
+
+    <textarea id="id_data" name="data">{}</textarea>
+
+  </form>
+
+
+  <script>
+
+
+    const form = document.getElementById('form');
+
+    const form_input = document.getElementById('id_data');
+
+
+    let server_update_data = {}
+
+
+
+    async function ping() {
+      try {
+        const res = await fetch('/workouts/pwa/ping/')
+
+        if (res.status === 200) {
+          Alpine.store('app').online = true
+          Alpine.store('app').error = false
+        }
+        else {
+          Alpine.store('app').online = false
+          Alpine.store('app').error = true
+        }
+      }
+      catch (err) {
+        console.debug('ping:', err.message)
+
+        Alpine.store('app').online = false
+      }
+    }
+
+
+    async function try_to_send_data(send_go_to_home) {
+      form_input.value = JSON.stringify(server_update_data)
+
+      const data = new FormData(form);
+      //console.debug(Array.from(data));  
+
+
+      try {
+        const res = await fetch(
+          '/workouts/pwa/update/',
+          {
+            method: 'POST',
+            body: data,
+          },
+        );
+        //console.debug(res);
+
+        const resData = await res.text();
+        //console.debug(resData);
+
+        // on success
+        if (res.status === 201) {
+
+          Alpine.store('app').online = true
+          Alpine.store('app').error = false
+
+          if (send_go_to_home === true) {
+            Alpine.store('workout').id = 0
+            form_input.value = '{}'
+
+            // reload only when "got_to_home" and online
+            location.reload()
+          }
+        }
+        else {
+          Alpine.store('app').online = false
+          Alpine.store('app').error = true
+        }
+
+      } catch (err) {
+        console.debug('try_to_send_data:', err.message);
+
+        Alpine.store('app').online = false
+
+      }
+    }
+
+
+
+    function format_time(value) {
+      return new Date(value).toISOString().substring(11, 19)
+    }
+
+    function show_time() {
+      const now = Alpine.store('workout').now()
+      //console.log('now:', now)
+      Alpine.store('workout').str_now = format_time(now)
+    }
+
+
+    document.addEventListener('alpine:init', () => {
+      //console.log('alpine:init')
+
+
+      Alpine.store('app', {
+        fg_online: false,
+        fg_error: false,
+      }),
+
+
+        Alpine.store('server', {
+          workouts: Alpine.$persist([]).as('server_workouts'),
+          session: Alpine.$persist([]).as('server_session'),
+        }),
+
+
+        Alpine.store('workout', {
+
+          id: Alpine.$persist(0).as('workout_id'),
+
+          ts_init: Alpine.$persist(0).as('workout_ts_init'),
+          ts_end: Alpine.$persist(0).as('workout_ts_end'),
+
+          laps: Alpine.$persist([]).as('workout_laps'),
+
+          str_now: '-- : -- : --',
+
+
+          new(id) {
+            this.id = id
+            this.ts_init = 0
+            this.ts_end = 0
+            this.laps = []
+          },
+
+          cancel(id) {
+            this.id = 0
+          },
+
+
+          try_to_update_server() {
+            server_update_data = {
+              id: this.id,
+              ts_init: this.ts_init,
+              ts_end: this.ts_end,
+              laps: this.laps,
+            }
+            try_to_send_data(false)
+            //console.debug(server_update_data)
+          },
+
+
+          start() {
+            this.ts_init = Date.now()
+            show_time()
+            //
+            this.try_to_update_server()
+          },
+
+          stop() {
+            if (this.ts_end > 0) {
+              // pass
+            }
+            else {
+              this.ts_end = Date.now()
+            }
+            show_time()
+            //
+            this.try_to_update_server()
+          },
+
+          now() {
+            if (this.ts_end > 0) {
+              return this.ts_end - this.ts_init
+            }
+            else if (this.ts_init > 0) {
+              return Date.now() - this.ts_init
+            }
+            else {
+              return 0
+            }
+            //
+            this.try_to_update_server()
+          },
+
+          add_lap() {
+            this.laps.push(Date.now())
+            //
+            this.try_to_update_server()
+          },
+
+          str_lap(value) {
+            return format_time(value - this.ts_init)
+          },
+
+        })
+
+
+      if (Alpine.store('workout').id > 0) {
+        Alpine.store('workout').try_to_update_server()
+      }
+
+      show_time()
+      const intervalID = setInterval(show_time, 999);
+
+      ping()
+      const ping_intervalID = setInterval(ping, 14999);
+
+    })
+
+
+
+  </script>
+
+  <!-- DO NOT CHANGE SCRIPT TAGs ORDER -->
+
+  <!-- Alpine Core -->
+  <!--
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
+  <script src="/static/pwa/alpine_core.js"></script>
+
+  <!-- DO NOT CHANGE SCRIPT TAGs ORDER -->
+
+
+  <!-- HTML MUST GO BELLOW -->
+
+
+  <hr>
+  <h2>app</h2>
+
+
+  <div>
+
+
+    <div id="home" x-show="!($store.workout.id)">
+
+
+      <button x-on:click="location.reload()" :disabled="!($store.app.online === true)">REFRESH DATA</button>
+
+      <ul>
+        <template x-for="workout in $store.server.workouts">
+          <li @click="$store.workout.new(workout.id)">
+            <span x-text="workout.id"></span>
+            -
+            <span x-text="workout.name"></span>
+          </li>
+        </template>
+      </ul>
+
+    </div>
+
+
+    <div id="timer" x-show="($store.workout.id)">
+
+      <button x-on:click="$store.workout.start()" :disabled="$store.workout.id > 0 && $store.workout.ts_init > 0">
+        START
+      </button>
+
+      <button x-on:click="$store.workout.add_lap()"
+        :disabled="$store.workout.ts_end > 0 || $store.workout.ts_init === 0">
+        LAP
+      </button>
+
+      <button x-on:click="$store.workout.stop()"
+        :disabled="$store.workout.ts_end > 0 || $store.workout.ts_init === 0">STOP</button>
+
+      <p x-text="$store.workout.str_now"></p>
+
+      <ul>
+        <template x-for="lap in $store.workout.laps">
+          <li x-text="$store.workout.str_lap(lap)"></li>
+        </template>
+      </ul>
+
+
+      <button x-on:click="try_to_send_data(true)"
+        :disabled="!($store.workout.ts_end > 0) || !($store.app.online === true)">SEND and go to home screen</button>
+
+      <button x-on:click="$store.workout.cancel()">CANCEL and discard data</button>
+
+
+    </div>
+
+
+  </div>
+
+
+
+  <hr>
+  <h2>pwa status</h2>
+
+  <ul>
+    <li>online: <span x-text="$store.app.online"></span></li>
+    <li>error: <span x-text="$store.app.error"></span></li>
+  </ul>
+
+
 </body>
 
 </html>

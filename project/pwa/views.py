@@ -28,7 +28,10 @@ def workouts(request):
     #
     ctx = {
         'form': form,
-        'jsdata': {'workouts': workouts},
+        'jsdata': {
+            'workouts': workouts,
+            'session': request.session.session_key,
+        },
     }
     #
     return render(request, 'workouts.html', ctx)
