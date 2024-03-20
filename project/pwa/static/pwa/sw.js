@@ -6,7 +6,7 @@
 const OFFLINE_VERSION = 202403191900;
 const CACHE_NAME = "offline";
 // Customize this with a different URL if needed.
-const OFFLINE_URL = "/static/pwa/offline.html";
+const OFFLINE_URL = "/static/pwa/pwa.html";//"/static/pwa/offline.html";
 
 
 // (A) CREATE/INSTALL CACHE
